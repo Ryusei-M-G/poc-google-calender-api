@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 const SuccessPage = () => {
 
   const [state, setState] = useState([]);
@@ -13,6 +13,11 @@ const SuccessPage = () => {
       console.log(err);
     }
   }
+
+  useEffect(()=>{
+    fetchHandle();
+  },[]
+  )
   return (
     <div style={
       {textAlign: 'center'}
