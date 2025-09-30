@@ -14,6 +14,7 @@ const oauth2Client = new google.auth.OAuth2(
 
 const server = express();
 server.use(cors());
+server.use(express.json())
 
 //認証
 server.get('/auth', (req, res) => {
@@ -28,9 +29,12 @@ server.get('/auth', (req, res) => {
 //google認証後のコールバック処理
 server.get('/auth/google/callback', callback
 );
-
 server.get('/events', getEvents);
-
+server.post('/addContent',(req, res) => {
+  const content = req.body;
+  console.log(content)
+}
+);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

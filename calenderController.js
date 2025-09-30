@@ -21,8 +21,6 @@ export const callback = async (req, res) => {
     oauth2Client.setCredentials(tokens);
 
     //仮でメモリに保存
-    console.log('Access Token:', tokens.access_token);
-    console.log('Refresh Token:', tokens.refresh_token);
     tokenStore.accessToken = tokens.access_token;
     tokenStore.refreshToken = tokens.refresh_token;
 
