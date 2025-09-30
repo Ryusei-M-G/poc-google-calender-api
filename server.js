@@ -43,7 +43,8 @@ server.get('/auth/google/callback', async (req, res) => {
     tokenStore.accessToken = tokens.access_token;
     tokenStore.refreshToken = tokens.refresh_token;
 
-    res.json({ message: 'OK', tokens });
+    // res.json({ message: 'OK', tokens });
+    res.redirect('http://localhost:5173/auth/success');
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -61,7 +62,7 @@ server.get('/events', async (req, res) => {
     refresh_token: tokenStore.refreshToken
   });
 
-  const calendar = google.calendar({version: 'v3', auth: oauth2Client});
+  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
   try {
     const result = await calendar.events.list({
