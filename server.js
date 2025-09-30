@@ -3,7 +3,7 @@ import cors from 'cors'
 import { google } from 'googleapis';
 import 'dotenv/config'
 
-import { callback, getEvents } from './calenderController.js';
+import { callback, getEvents, addContent } from './calenderController.js';
 
 //クライアント初期化
 const oauth2Client = new google.auth.OAuth2(
@@ -27,14 +27,11 @@ server.get('/auth', (req, res) => {
 });
 
 //google認証後のコールバック処理
-server.get('/auth/google/callback', callback
-);
+server.get('/auth/google/callback', callback);
+//カレンダー情報を取得しクライアントへ返却する。
 server.get('/events', getEvents);
-server.post('/addContent',(req, res) => {
-  const content = req.body;
-  console.log(content)
-}
-);
+//クライアントからきたjsonをカレンダーに追加する
+server.post('/addContent', addContent);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

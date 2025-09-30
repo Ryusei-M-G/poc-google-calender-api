@@ -59,3 +59,10 @@ export const getEvents = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 }
+
+export const addContent = (req, res) => {
+  const content = req.body;
+  console.log(content)
+
+  
+}
