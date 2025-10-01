@@ -1,15 +1,14 @@
+import Calendar from './Calendar.jsx';
 
 function App() {
   const onClickHandle = () => {
-
-    window.location.href =
-      'http://localhost:3000/auth';
-
-
+    window.location.href = 'http://localhost:3000/auth';
   }
+
   return (
-    <div>
-      <button onClick={onClickHandle}>Button</button>
+    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      <button onClick={onClickHandle}>Googleでログイン</button>
+      <Calendar />
     </div>
   )
 }

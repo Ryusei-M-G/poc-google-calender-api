@@ -1,41 +1,20 @@
-import { useState, useEffect } from "react";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const SuccessPage = () => {
+  const navigate = useNavigate();
 
-  const [state, setState] = useState([]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate('/');
+    }, 1000);
 
-  const fetchHandle = async () => {
-    try {
-      const res = await fetch('http://localhost:3000/events');
-      const data = await res.json();
-      console.log(data);
-      setState(data);
-    } catch (err) {
-      console.log(err);
-    }
-  }
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
-  useEffect(()=>{
-    fetchHandle();
-  },[]
-  )
-  return (
-    <div style={
-      {textAlign: 'center'}
-    }>
-      <div>login success</div>
-      <button onClick={fetchHandle}>button</button>
-      {
-        state.map((e) => {
-          return (
-            <div key={e.id} style={{border: 'solid',borderRadius:'16px',padding:'1rem',margin:'1rem'}}>
-              <div>{e.start?.dateTime}</div>
-              <div>{e.start?.date}</div>
-              <div>{e.summary}</div>
-            </div>
-          )
-        })
-      }
-
+  return(
+    <div style={{textAlign:'center'}}>
+      ログイン成功
     </div>
   )
 }
