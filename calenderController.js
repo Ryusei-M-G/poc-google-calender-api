@@ -13,6 +13,21 @@ const tokenStore = {
   refreshToken: null
 };
 
+// トークン確認と設定を行うヘルパー関数
+const setOAuthCredentials = (res) => {
+  if (!tokenStore.accessToken) {
+    res.status(401).json({ error: 'Not authenticated. Please visit /auth first.' });
+    return false;
+  }
+
+  oauth2Client.setCredentials({
+    access_token: tokenStore.accessToken,
+    refresh_token: tokenStore.refreshToken
+  });
+
+  return true;
+};
+
 export const callback = async (req, res) => {
   const { code } = req.query;
 
@@ -32,16 +47,7 @@ export const callback = async (req, res) => {
 }
 
 export const getEvents = async (req, res) => {
-  // トークン存在チェック
-  if (!tokenStore.accessToken) {
-    return res.status(401).json({ error: 'Not authenticated. Please visit /auth first.' });
-  }
-
-  // 保存されたトークンを使用
-  oauth2Client.setCredentials({
-    access_token: tokenStore.accessToken,
-    refresh_token: tokenStore.refreshToken
-  });
+  if (!setOAuthCredentials(res)) return;
 
   const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
@@ -60,9 +66,12 @@ export const getEvents = async (req, res) => {
   }
 }
 
-export const addContent = (req, res) => {
-  const content = req.body;
-  console.log(content)
+export const addContent = async(req, res) => {
+  if (!setOAuthCredentials(res)) return;
 
-  
+  const content = req.body;
+  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+
+
 }
