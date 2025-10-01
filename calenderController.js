@@ -69,9 +69,34 @@ export const getEvents = async (req, res) => {
 export const addContent = async(req, res) => {
   if (!setOAuthCredentials(res)) return;
 
-  const content = req.body;
+  const { startDate, endDate, text } = req.body;
+
+  if (!startDate || !endDate || !text) {
+    return res.status(400).json({ error: 'startDate, endDate and text are required' });
+  }
+
   const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
+  try {
+    const event = {
+      summary: text,
+      start: {
+        dateTime: new Date(startDate).toISOString(),
+        timeZone: 'Asia/Tokyo',
+      },
+      end: {
+        dateTime: new Date(endDate).toISOString(),
+        timeZone: 'Asia/Tokyo',
+      },
+    };
 
+    const result = await calendar.events.insert({
+      calendarId: 'primary',
+      resource: event,
+    });
 
+    res.json({ message: 'Event created successfully', event: result.data });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 }
