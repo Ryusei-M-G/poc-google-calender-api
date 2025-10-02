@@ -33,22 +33,38 @@ export const callback = async (req, res) => {
   const { code } = req.query;
 
   try {
+    console.log('[Auth] Callback started');
+
     // トークン取得
     const { tokens } = await oauth2Client.getToken(code);
 
-    // セッションにトークンを保存
-    req.session.accessToken = tokens.access_token;
-    req.session.refreshToken = tokens.refresh_token;
-    req.session.expiresAt = tokens.expiry_date;
+    // セッションIDをemailとして使用してユーザーを作成/取得
+    const sessionId = req.sessionID;
+    const user = await findOrCreateUser(sessionId);
+    console.log('[Auth] User created/found:', user.id);
+
+    // トークンを暗号化してDBに保存
+    await saveGoogleToken(
+      user.id,
+      tokens.access_token,
+      tokens.refresh_token,
+      tokens.expiry_date ? Math.floor((tokens.expiry_date - Date.now()) / 1000) : 3600
+    );
+    console.log('[Auth] Token saved to DB');
+
+    // セッションにユーザーIDを保存
+    req.session.userId = user.id;
 
     //仮でメモリにも保存（既存機能の後方互換性のため）
     tokenStore.accessToken = tokens.access_token;
     tokenStore.refreshToken = tokens.refresh_token;
 
+    console.log('[Auth] Authentication completed successfully');
+
     // フロントにリダイレクト（セッションIDはCookieで自動送信）
     res.redirect('http://localhost:5173/auth/success');
   } catch (error) {
-    console.error('Callback error:', error);
+    console.error('[Auth] Callback error:', error);
     res.status(500).json({ error: error.message });
   }
 }

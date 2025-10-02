@@ -16,7 +16,9 @@ const Form = () => {
       text: text,
     };
 
-    const response = await axios.post("http://localhost:3000/addContent",info);
+    const response = await axios.post("http://localhost:3000/addContent", info, {
+      withCredentials: true
+    });
     console.log(response.data);
 
   }

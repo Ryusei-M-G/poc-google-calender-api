@@ -27,7 +27,9 @@ const Calendar = () =>{
 
   const fetchHandle = async () => {
     try {
-      const res = await fetch('http://localhost:3000/events');
+      const res = await fetch('http://localhost:3000/events', {
+        credentials: 'include'
+      });
       const data = await res.json();
       console.log(data);
       setState(data);
