@@ -8,7 +8,7 @@ function App() {
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       <button onClick={onClickHandle}>Googleでログイン</button>
-      {/* <Calendar /> */}
+      <Calendar />
     </div>
   )
 }

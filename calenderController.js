@@ -8,27 +8,6 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_REDIRECT_URI
 );
 
-//仮実装トークン保存（後方互換性のため残す）
-const tokenStore = {
-  accessToken: null,
-  refreshToken: null
-};
-
-// トークン確認と設定を行うヘルパー関数
-const setOAuthCredentials = (res) => {
-  if (!tokenStore.accessToken) {
-    res.status(401).json({ error: 'Not authenticated. Please visit /auth first.' });
-    return false;
-  }
-
-  oauth2Client.setCredentials({
-    access_token: tokenStore.accessToken,
-    refresh_token: tokenStore.refreshToken
-  });
-
-  return true;
-};
-
 export const callback = async (req, res) => {
   const { code } = req.query;
 
@@ -55,10 +34,6 @@ export const callback = async (req, res) => {
     // セッションにユーザーIDを保存
     req.session.userId = user.id;
 
-    //仮でメモリにも保存（既存機能の後方互換性のため）
-    tokenStore.accessToken = tokens.access_token;
-    tokenStore.refreshToken = tokens.refresh_token;
-
     console.log('[Auth] Authentication completed successfully');
 
     // フロントにリダイレクト（セッションIDはCookieで自動送信）
@@ -70,11 +45,27 @@ export const callback = async (req, res) => {
 }
 
 export const getEvents = async (req, res) => {
-  if (!setOAuthCredentials(res)) return;
-
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  // セッション認証チェック
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not authenticated. Please visit /auth first.' });
+  }
 
   try {
+    // DBからトークンを取得
+    const tokens = await getGoogleToken(req.session.userId);
+
+    if (!tokens) {
+      return res.status(401).json({ error: 'Token not found. Please re-authenticate.' });
+    }
+
+    // OAuth2クライアントに認証情報をセット
+    oauth2Client.setCredentials({
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken
+    });
+
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
     const result = await calendar.events.list({
       calendarId: 'primary',
       timeMin: new Date().toISOString(),
@@ -85,12 +76,16 @@ export const getEvents = async (req, res) => {
 
     res.json(result.data.items);
   } catch (error) {
+    console.error('[API] getEvents error:', error);
     res.status(500).json({ error: error.message });
   }
 }
 
 export const addContent = async(req, res) => {
-  if (!setOAuthCredentials(res)) return;
+  // セッション認証チェック
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not authenticated. Please visit /auth first.' });
+  }
 
   const { startDate, endDate, text } = req.body;
 
@@ -98,9 +93,22 @@ export const addContent = async(req, res) => {
     return res.status(400).json({ error: 'startDate, endDate and text are required' });
   }
 
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
-
   try {
+    // DBからトークンを取得
+    const tokens = await getGoogleToken(req.session.userId);
+
+    if (!tokens) {
+      return res.status(401).json({ error: 'Token not found. Please re-authenticate.' });
+    }
+
+    // OAuth2クライアントに認証情報をセット
+    oauth2Client.setCredentials({
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken
+    });
+
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
     const event = {
       summary: text,
       start: {
@@ -120,6 +128,7 @@ export const addContent = async(req, res) => {
 
     res.json({ message: 'Event created successfully', event: result.data });
   } catch (error) {
+    console.error('[API] addContent error:', error);
     res.status(500).json({ error: error.message });
   }
 }
