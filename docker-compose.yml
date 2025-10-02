@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: poc-calendar-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-calendar_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-calendar_password}
+      POSTGRES_DB: ${DB_NAME:-calendar_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-calendar_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

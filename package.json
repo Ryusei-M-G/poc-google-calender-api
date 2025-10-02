@@ -19,10 +19,13 @@
   "description": "",
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",
+    "@prisma/client": "^6.16.3",
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "gitignore": "^0.7.0",
-    "googleapis": "^105.0.0"
+    "googleapis": "^105.0.0",
+    "prisma": "^6.16.3"
   }
 }
