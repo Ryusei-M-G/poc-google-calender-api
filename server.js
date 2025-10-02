@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import session from 'express-session'
+import pg from 'pg'
 import { google } from 'googleapis';
 import 'dotenv/config'
 
@@ -13,8 +15,26 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 const server = express();
-server.use(cors());
-server.use(express.json())
+
+// CORS設定（credentials: trueでCookieを送受信可能に）
+server.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
+server.use(express.json());
+
+// セッション設定
+server.use(session({
+  secret: process.env.SESSION_SECRET || 'default-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false, // 本番環境ではtrue（HTTPS必須）
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 7日間
+  }
+}))
 
 //認証
 server.get('/auth', (req, res) => {

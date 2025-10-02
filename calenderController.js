@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import { google } from 'googleapis';
+import { findOrCreateUser, saveGoogleToken, getGoogleToken } from './dbContoller.js';
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -7,7 +8,7 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_REDIRECT_URI
 );
 
-//仮実装トークン保存
+//仮実装トークン保存（後方互換性のため残す）
 const tokenStore = {
   accessToken: null,
   refreshToken: null
@@ -32,16 +33,37 @@ export const callback = async (req, res) => {
   const { code } = req.query;
 
   try {
+    // 1. トークン取得
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
 
-    //仮でメモリに保存
+    // 2. ユーザー情報を取得（Google OAuth2 API）
+    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+    const { data: userInfo } = await oauth2.userinfo.get();
+
+    // 3. ユーザーをDBに保存または取得
+    const user = await findOrCreateUser(userInfo.email);
+
+    // 4. トークンを暗号化してDBに保存
+    await saveGoogleToken(
+      user.id,
+      tokens.access_token,
+      tokens.refresh_token,
+      tokens.expiry_date ? Math.floor((tokens.expiry_date - Date.now()) / 1000) : 3600
+    );
+
+    // 5. セッションにユーザーIDを保存
+    req.session.userId = user.id;
+    req.session.email = user.email;
+
+    //仮でメモリにも保存（既存機能の後方互換性のため）
     tokenStore.accessToken = tokens.access_token;
     tokenStore.refreshToken = tokens.refresh_token;
 
-    // res.json({ message: 'OK', tokens });
+    // 6. フロントにリダイレクト（セッションIDはCookieで自動送信）
     res.redirect('http://localhost:5173/auth/success');
   } catch (error) {
+    console.error('Callback error:', error);
     res.status(500).json({ error: error.message });
   }
 }

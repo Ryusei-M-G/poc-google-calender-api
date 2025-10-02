@@ -47,15 +47,11 @@
 ## 技術スタック検討事項
 
 ### データベース
-- PostgreSQL（推奨）
-- MySQL
-- SQLite（開発用）
+- PostgreSQL
 
 ### 認証方式
 - JWT（JSON Web Token）
 - セッションベース（Cookie）
 
 ### ORM
-- Prisma（推奨）
-- Sequelize
-- TypeORM
+- Prisma
