@@ -5,7 +5,7 @@ import pg from 'pg'
 import { google } from 'googleapis';
 import 'dotenv/config'
 
-import { callback, getEvents, addContent } from './calenderController.js';
+import { callback, getEvents, addContent } from './calendarController.js';
 
 //クライアント初期化
 const oauth2Client = new google.auth.OAuth2(
