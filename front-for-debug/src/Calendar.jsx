@@ -42,14 +42,33 @@ const Calendar = () =>{
 
   // ---- Mock API handlers (since server endpoints are not ready) ----
   const mockDeleteEvent = async (id) => {
-    // Simulate latency
-    await new Promise((res) => setTimeout(res, 200));
+    const res = await fetch(`http://localhost:3000/deleteContent/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(text || 'Failed to delete event');
+    }
     return { ok: true, id };
   };
 
   const mockUpdateEvent = async (id, payload) => {
-    // Simulate latency and echo back update
-    await new Promise((res) => setTimeout(res, 250));
+    const { summary, description, startInput, endInput, isAllDay } = payload || {};
+    const text = summary || description || '';
+    const startDate = isAllDay ? (startInput ? `${startInput}T00:00` : '') : (startInput || '');
+    const endDate = isAllDay ? (endInput ? `${endInput}T00:00` : '') : (endInput || '');
+
+    const res = await fetch(`http://localhost:3000/updateContent/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ startDate, endDate, text })
+    });
+    if (!res.ok) {
+      const textBody = await res.text().catch(() => '');
+      throw new Error(textBody || 'Failed to update event');
+    }
     return { ok: true, id, payload };
   };
 

@@ -53,9 +53,9 @@ server.get('/events', getEvents);
 //クライアントからきたjsonをカレンダーに追加する
 server.post('/addContent', addContent);
 //指定のカレンダーの削除
-server.delete('/deleteContent', deleteContent);
+server.delete('/deleteContent/:eventId', deleteContent);
 //指定のカレンダーの変更
-server.put('/updateContent',updateContent);
+server.put('/updateContent/:eventId', updateContent);
 // フロントからセッションの有無を確認するためのエンドポイント
 server.get('/auth/me', (req, res) => {
   if (req.session && req.session.userId) {
