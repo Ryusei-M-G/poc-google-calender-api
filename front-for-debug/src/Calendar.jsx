@@ -183,30 +183,44 @@ const Calendar = () =>{
                     <button
                       onClick={() => startEdit(e)}
                       style={{
-                        padding: '6px 10px',
+                        height: 36,
+                        width: 36,
+                        padding: 0,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         border: '1px solid #0d6efd',
-                        borderRadius: '6px',
+                        borderRadius: '50%',
                         backgroundColor: '#0d6efd',
                         color: '#fff',
                         cursor: 'pointer'
                       }}
+                      aria-label="編集"
+                      title="編集"
                       disabled={editingId === e.id}
                     >
-                      編集
+                      <span className="material-icons" style={{ fontSize: 20, lineHeight: 0 }}>edit</span>
                     </button>
                     <button
                       onClick={() => handleDelete(e.id)}
                       style={{
-                        padding: '6px 10px',
+                        height: 36,
+                        width: 36,
+                        padding: 0,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         border: '1px solid #dc3545',
-                        borderRadius: '6px',
+                        borderRadius: '50%',
                         backgroundColor: '#dc3545',
                         color: '#fff',
                         cursor: 'pointer'
                       }}
+                      aria-label="削除"
+                      title="削除"
                       disabled={editingId === e.id}
                     >
-                      削除
+                      <span className="material-icons" style={{ fontSize: 20, lineHeight: 0 }}>delete</span>
                     </button>
                   </div>
                 </div>
