@@ -2,15 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 
 const AuthContext = createContext(null);
 
-const hasSessionCookie = () => {
-  if (typeof document === 'undefined') return false;
-  const raw = document.cookie || '';
-  if (!raw) return false;
-  // 厳密に名前を判定
-  const pairs = raw.split(';').map((s) => s.trim());
-  return pairs.some((p) => p.startsWith('session=') || p.startsWith('connect.sid='));
-};
-
 export function AuthProvider({ children }) {
   // useRefで認証状態を保持（再レンダリングを避ける要件に沿う）
   const isAuthenticated = useRef(false);
@@ -37,6 +28,11 @@ export function AuthProvider({ children }) {
       }
     };
     check();
+    // タブに戻った際にも最新化
+    window.addEventListener('focus', check);
+    return () => {
+      window.removeEventListener('focus', check);
+    };
   }, []);
 
   const refresh = async () => {
