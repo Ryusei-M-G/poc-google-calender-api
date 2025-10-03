@@ -53,6 +53,14 @@ server.get('/events', getEvents);
 //クライアントからきたjsonをカレンダーに追加する
 server.post('/addContent', addContent);
 
+// フロントからセッションの有無を確認するためのエンドポイント
+server.get('/auth/me', (req, res) => {
+  if (req.session && req.session.userId) {
+    return res.json({ authenticated: true, userId: req.session.userId });
+  }
+  return res.status(401).json({ authenticated: false });
+});
+
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log('server start');
