@@ -1,6 +1,8 @@
 import Calendar from './Calendar.jsx';
+import { useAuth } from './auth/AuthProvider.jsx';
 
 function App() {
+  const { isAuthenticated } = useAuth();
 
   const onClickHandle = () => {
     window.location.href = 'http://localhost:3000/auth';
@@ -8,8 +10,10 @@ function App() {
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <button onClick={onClickHandle}>Googleでログイン</button>
-      <Calendar />
+      {!isAuthenticated.current && (
+        <button onClick={onClickHandle}>Googleでログイン</button>
+      )}
+      {isAuthenticated.current && <Calendar />}
     </div>
   )
 }
