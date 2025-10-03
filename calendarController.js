@@ -132,3 +132,11 @@ export const addContent = async(req, res) => {
     res.status(500).json({ error: error.message });
   }
 }
+
+export const deleteContent = async(req,res) => {
+
+}
+
+export const updateContent = asnyc(req,res) => {
+  
+}

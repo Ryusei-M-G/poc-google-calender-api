@@ -5,7 +5,7 @@ import pg from 'pg'
 import { google } from 'googleapis';
 import 'dotenv/config'
 
-import { callback, getEvents, addContent } from './calendarController.js';
+import { callback, getEvents, addContent,deleteContent,updateContent } from './calendarController.js';
 
 //クライアント初期化
 const oauth2Client = new google.auth.OAuth2(
@@ -16,7 +16,7 @@ const oauth2Client = new google.auth.OAuth2(
 
 const server = express();
 
-// CORS設定（credentials: trueでCookieを送受信可能に）
+// CORS設定(cookie許可)
 server.use(cors({
   origin: 'http://localhost:5173',
   credentials: true
@@ -52,7 +52,10 @@ server.get('/auth/google/callback', callback);
 server.get('/events', getEvents);
 //クライアントからきたjsonをカレンダーに追加する
 server.post('/addContent', addContent);
-
+//指定のカレンダーの削除
+server.delete('/deleteContent', deleteContent);
+//指定のカレンダーの変更
+server.put('/updateContent',updateContent);
 // フロントからセッションの有無を確認するためのエンドポイント
 server.get('/auth/me', (req, res) => {
   if (req.session && req.session.userId) {
